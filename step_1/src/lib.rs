@@ -12,6 +12,9 @@
 ///       size arrays of utf-8 characters.
 ///    c. str instances are almost always managed through
 ///       references, e.g., &str
+///    d. It is easy to convert between String and str 
+///       types - see code below.
+/// https://github.com/Dhghomon/easy_rust#strings
 /// 2. Rust uses Structs where C++ and C# use classes.
 ///    e. Methods are defined using impl blocks, as shown
 ///       below.
@@ -23,6 +26,7 @@
 ///       &self or &mut self is passed to the method code
 ///       implicitly, e.g., not supplied by the using
 ///       code. 
+/// https://github.com/Dhghomon/easy_rust#implementing-structs-and-enums
 
 #[derive(Debug, Clone, Default)]
 pub struct Demo {
@@ -49,8 +53,9 @@ impl Demo {
     pub fn get_name(&self) -> &str {
         &self.name
     }
-}
-/// Note:
+}////////////////////////////////////////////////////////////
+/// Testing:
+/// ---------------------------------------------------------
 /// Rust libraries can be configured with unit tests,
 /// as you see below.  You run them with the command:
 ///   cargo test
@@ -60,6 +65,7 @@ impl Demo {
 /// will preserve the test order, use the command: 
 ///   cargo test -- --test-threads=1
 #[cfg(test)]
+/// Notes:
 /// 1. test_construct() uses typ_name method from std::any
 /// 2. All tests use the fact that private data in a struct
 ///    is accessible (only) within the defining library

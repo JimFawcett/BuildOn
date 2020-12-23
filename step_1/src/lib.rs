@@ -3,7 +3,24 @@
 ///
 /// Jim Fawcett, https://JimFawcett.github.io, 23 Nov 2020 
 /////////////////////////////////////////////////////////////
-/// Notes:
+/// This demo illustrates how you define structs and use them
+/// like classes in C++ and C#.
+/// 
+/// This package builds a static library.  There is a console
+/// application, called test1 in the examples directory, sister
+/// to the src directory where this file resides.
+/// 
+/// test1 uses this library by declaring:
+///   uses step_1::*;
+/// e.g., use any of the facilities provided by this library.
+/// The name, step_1, is defined in Cargo.toml.
+/// 
+/// You build test1 and link to this library with the cargo command:
+///   cargo run --example test1
+/// Note that the option is example (singular) even though the directory
+/// name is examples.
+/////////////////////////////////////////////////////////////
+/// Rust Notes:
 /// 1. Two string types are defined in the std library
 ///    a. String is a type that manages a collection of
 ///       utf-8 characters in the native heap.
@@ -28,6 +45,11 @@
 ///       code. 
 /// https://github.com/Dhghomon/easy_rust#implementing-structs-and-enums
 
+/// Debug, Clone, and Default are traits, much like Java or C# interfaces.
+/// Some traits, like these can be implemented by the compiler.  The
+/// #[derive(Debug, Clone, Default)] annotation is asking the compiler
+/// to do that.
+/// 
 #[derive(Debug, Clone, Default)]
 pub struct Demo {
     value: f64,
@@ -35,21 +57,36 @@ pub struct Demo {
 }
 
 impl Demo {
+    /// static constructor method
+    /// -----------------------------------------
     pub fn new() -> Self {
         Demo {
             value: 0.0,
             name: String::from("un_named"),
         }
     }
+    /// method that sets Demo::value to v
+    /// -----------------------------------------
     pub fn set_value(&mut self, v:f64) {
         self.value = v
     }
+    /// method that retrieves Demo::value
+    /// -----------------------------------------
     pub fn get_value(&self) -> f64 {
         self.value
     }
+    /// method that sets Demo::name
+    /// -----------------------------------------
+    /// Note that nm is passed by reference &str
+    /// If we passed by value, e.g., nm:String
+    /// that would move nm into the function and
+    /// it would become invalid in the caller's scope
+    /// -----------------------------------------
     pub fn set_name(&mut self, nm:&str) {
         self.name = String::from(nm);
     }
+    /// method returns name as a reference
+    /// -----------------------------------------
     pub fn get_name(&self) -> &str {
         &self.name
     }

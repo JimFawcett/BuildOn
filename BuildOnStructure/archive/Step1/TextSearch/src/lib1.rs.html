@@ -1,20 +1,15 @@
-///////////////////////////////////////////////////////////
+<pre>///////////////////////////////////////////////////////////
 // BuildOnStructure::TextSearch.rs                       //
 //   - demonstrate code structure for Step #1            //
 // Jim Fawcett, https://JimFawcett.github.io, 14 Jan 21  //
 ///////////////////////////////////////////////////////////
 
 /*-----------------------------------------------
-  A trait is similar to an interface, most often
-  used to convey a communication protocol for
-  generic types.
-
-  SearchEvent trait is not needed here, but will be in 
-  Step #4
+  Trait is not needed here, but will be in Step #4
 */
-pub trait SearchEvent {
-    fn set_dir(&mut self, dir: &str);
-    fn set_file(&mut self, rslt: (&str, bool, &str));
+pub trait ToOut {
+    fn set_dir(&amp;mut self, dir: &amp;str);
+    fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str));
 }
 /*-----------------------------------------------
   GenOut converts Finder's data into information
@@ -25,12 +20,12 @@ pub struct GenOut {
     dir: String
 }
 /*-- implement trait --------------------------*/
-impl SearchEvent for GenOut {
-    fn set_dir(&mut self, rdir: &str) {
+impl ToOut for GenOut {
+    fn set_dir(&amp;mut self, rdir: &amp;str) {
         self.dir = rdir.to_string();
         print!("\n  {}", rdir);
     }
-    fn set_file(&mut self, rslt: (&str, bool, &str)) {
+    fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str)) {
         let (file, found, text) = rslt;
         if found {
             print!("\n    {}: {:?} found", file, text);
@@ -42,21 +37,11 @@ impl SearchEvent for GenOut {
 }
 /*-- implement other member functions ---------*/
 impl GenOut {
-    pub fn new() -> GenOut {
+    pub fn new() -&gt; GenOut {
         GenOut {
             dir: String::new()
         }
     }
-}
-/*-----------------------------------------------
-  Trait DirEvents specifies functions that
-  Finder provides to support DirNav calls.
-
-  Not used in this step.
-*/
-pub trait DirEvent {
-    fn do_dir(&mut self, dir: &str);
-    fn do_file(&mut self, file: &str);
 }
 /*-----------------------------------------------
   Finder searches for text in specified file
@@ -64,16 +49,21 @@ pub trait DirEvent {
 #[derive(Debug)]
 pub struct Finder {
       dir: String,
-      srctxt: String,
       out: GenOut
 }
-/*-- implement DirEvent --*/
-impl DirEvent for Finder {
-    fn do_dir(&mut self, dir: &str) {
-        self.dir = dir.to_string();
-        self.out.set_dir(dir);
+/*-- implement Finder methods -----------------*/
+impl Finder {
+    pub fn new() -&gt; Finder {
+        Finder {
+            dir: String::new(),
+            out: GenOut::new()
+        }
     }
-    fn do_file(&mut self, file: &str) {
+    pub fn set_dir(&amp;mut self, dirnm: &amp;str) {
+        self.dir = dirnm.to_string();
+        self.out.set_dir(dirnm);
+    }
+    pub fn find(&amp;mut self, flnm: &amp;str, stxt: &amp;str) {
         /* 
             Pretending to search for text in file.
             Function should:
@@ -82,25 +72,12 @@ impl DirEvent for Finder {
               3. search for text
               4. send result to out 
         */
-        if self.srctxt == "BuildOn" {
-            self.out.set_file((file, true, &self.srctxt));
+        if stxt == "BuildOn" {
+            self.out.set_file((flnm, true, stxt));
         }
         else {
-            self.out.set_file((file, false, &self.srctxt));
+            self.out.set_file((flnm, false, stxt));
         }
-    }
-}
-/*-- implement Finder methods -----------------*/
-impl Finder {
-    pub fn new() -> Finder {
-        Finder {
-            dir: String::new(),
-            srctxt: String::new(),
-            out: GenOut::new()
-        }
-    }
-    pub fn set_txt(&mut self, txt: &str) {
-        self.srctxt = txt.to_string();
     }
 }
 
@@ -118,3 +95,4 @@ mod tests {
         assert_eq!(f.dir, "".to_string());
     }
 }
+</pre>

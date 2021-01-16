@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////
+<pre>/////////////////////////////////////////////////////////////
 // Step#2::DirNav::lib.rs - demos mock DirNav operations   //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
@@ -18,10 +18,10 @@
 */
 pub trait DirEvent {
     /*-- constructible --*/
-    fn new() -> Self;
+    fn new() -&gt; Self;
     /*-- event handlers --*/
-    fn do_dir(&mut self, dir:&str);
-    fn do_file(&mut self, file: &str);
+    fn do_dir(&amp;mut self, dir:&amp;str);
+    fn do_file(&amp;mut self, file: &amp;str);
 }
 
 //#region : Sample App implementing DirEvent
@@ -36,14 +36,14 @@ pub struct App {
     curr_dir: String
 }
 impl DirEvent for App {
-    fn new() -> Self {
+    fn new() -&gt; Self {
         App { curr_dir: String::new() }
     }
-    fn do_dir(&mut self, dir: &str) {
+    fn do_dir(&amp;mut self, dir: &amp;str) {
         print!("\n  directory: {:?}",dir);
         self.curr_dir = dir.to_string();
     }
-    fn do_file(&mut self, file: &str) {
+    fn do_file(&amp;mut self, file: &amp;str) {
         print!("\n    file: {:?}", file);
     }
 }
@@ -57,19 +57,19 @@ impl DirEvent for App {
   This is a mock type defined as an illustration
   of what Step #2 needs.
 */
-pub struct DirNav<T> where T:DirEvent {
+pub struct DirNav&lt;T&gt; where T:DirEvent {
     app : T
 }
-impl<T> DirNav<T> where T:DirEvent {
-    pub fn new() -> DirNav<T> {
+impl&lt;T&gt; DirNav&lt;T&gt; where T:DirEvent {
+    pub fn new() -&gt; DirNav&lt;T&gt; {
         DirNav {
           app: T::new()
         }
     }
-    pub fn get_app(&self) -> &T {
-        &self.app
+    pub fn get_app(&amp;self) -&gt; &amp;T {
+        &amp;self.app
     }
-    pub fn start(&mut self) {
+    pub fn start(&amp;mut self) {
         /* pretending to search a dir tree */
         self.app.do_dir("dir1");
         self.app.do_file("file1");
@@ -86,3 +86,4 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
+</pre>

@@ -1,0 +1,107 @@
+<pre>/////////////////////////////////////////////////////////////
+// basic_dip::main.rs                                      //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 19 Jan 2021  //
+/////////////////////////////////////////////////////////////
+/*
+    Demonstrates Dependency Inversion Principle:
+      "High level modules should not depend on
+       low level modules.  Both should depend
+       on abstractions."
+
+    This demonstration builds a basic demo with self
+    annunciating low level components.
+    
+      - High level part: Demo&lt;T&gt;
+      - Low level parts: First, Second
+      - Abstraction defined in this package: 
+        - trait Say
+    The definitons of First and Second could be
+    changed in any way that is compatible with 
+    trait Say without affecting compilation of
+    Demo&lt;T&gt;.
+*/
+
+
+#![allow(dead_code)]
+
+/*-----------------------------------------------
+  
+*/
+pub trait Say {
+    fn new() -&gt; Self;  // factory function
+    fn set_id(&amp;mut self, id: u8);
+    fn get_id(&amp;self) -&gt; u8;
+    fn say(&amp;self);
+}
+
+pub struct First {
+    id: u8
+}
+impl Say for First {
+    fn new() -&gt; First {
+        First {
+            id: 0
+        }
+    }
+    fn set_id(&amp;mut self, id: u8) {
+        self.id = id;
+    }
+    fn get_id(&amp;self) -&gt; u8 {
+        self.id
+    }
+    fn say(&amp;self) {
+        print!("\n  First here with id = {:?}",self.id);
+    }
+}
+pub struct Second {
+    id: u8
+}
+impl Say for Second {
+    fn new() -&gt; Second {
+        Second {
+            id: 0
+        }
+    }
+    fn set_id(&amp;mut self, id: u8) {
+        self.id = id;
+    }
+    fn get_id(&amp;self) -&gt; u8 {
+        self.id
+    }
+    fn say(&amp;self) {
+        print!("\n  Second here with id = {:?}",self.id);
+    }
+}
+struct Demo&lt;T&gt; where T: Say {
+    my_say: T
+}
+impl&lt;T&gt; Demo&lt;T&gt; where T: Say {
+    fn new() -&gt; Demo&lt;T&gt; {
+        Demo {
+            my_say: T::new()  // using factory function
+        }
+    }
+    fn set_id(&amp;mut self, id:u8) {
+        self.my_say.set_id(id);  // using trait method
+    }
+    fn get_id(&amp;self) -&gt; u8 {
+        self.my_say.get_id()     // using trait method
+    }
+    fn say_it(&amp;self) {
+        self.my_say.say();       // using trait method
+    }
+}
+
+fn main() {
+    print!("\n  -- basic_dip demo --\n");
+
+    let mut first = Demo::&lt;First&gt;::new();
+    first.set_id(1);
+    first.say_it();
+    let mut second = Demo::&lt;Second&gt;::new();
+    second.set_id(2);
+    second.say_it();
+    println!("\n\n  That's all Folks!\n\n");
+}
+</pre>

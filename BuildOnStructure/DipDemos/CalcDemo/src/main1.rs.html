@@ -1,0 +1,126 @@
+<pre>/////////////////////////////////////////////////////////////
+// diip_calc::main.rs                                      //
+//   - demonstrates Dependency Inversion Principle         //
+//     with calculator                                     //
+// Jim Fawcett, https://JimFawcett.github.io, 19 Jan 2021  //
+/////////////////////////////////////////////////////////////
+/*
+    Demonstrates Dependency Inversion Principle:
+      "High level modules should not depend on
+       low level modules.  Both should depend
+       on abstractions."
+
+    This demonstration builds a calculator for 
+    adding and multiplying two copy types.
+      - High level part: Demo&lt;U,T&gt;
+      - Low level parts: Plust&lt;T&gt;, Times&lt;T&gt;
+      - Abstraction defined in this package: 
+        - Calc&lt;T&gt; defined here
+      - Abstractions defined by the Rust std::libs
+        https://doc.rust-lang.org/beta/std/:
+        - std::marker::Copy
+        - std::ops::Add
+        - std::ops::Mul
+        - std::default::Default
+    The definitons of Plus&lt;T&gt; and Times&lt;T&gt; could be
+    changed in any way that is compatible with these
+    abstractions without affecting compilation of
+    Demo&lt;U,T&gt;.
+*/
+
+#![allow(dead_code)]
+use std::ops::{Add, Mul};
+use std::default::Default;
+use std::marker::{Copy, PhantomData};
+
+/*-----------------------------------------------------
+  All calculator classes must have these functions.
+*/
+pub trait Calc&lt;T&gt; {
+    fn new() -&gt; Self;
+    fn calc(arg1:T, arg2:T) -&gt; T;
+}
+/*-----------------------------------------------------
+  Adds two Copy types
+*/
+struct Plus&lt;T&gt; where T: Copy + Add + Add&lt;Output = T&gt; {
+    phantom: PhantomData&lt;T&gt;
+}
+impl&lt;T&gt; Calc&lt;T&gt; for Plus&lt;T&gt; where T: Copy + Add + Add&lt;Output = T&gt; {
+    fn new() -&gt; Self {
+        Plus {
+            phantom: PhantomData
+        }
+    }
+    fn calc(arg1:T, arg2:T) -&gt; T {
+        arg1 + arg2
+    }
+}
+/*-----------------------------------------------------
+   Multiplies two Copy types
+*/
+struct Times&lt;T&gt; where T: Copy + Mul + Mul&lt;Output = T&gt; {
+    phantom: PhantomData&lt;T&gt;
+}
+impl&lt;T&gt; Calc&lt;T&gt; for Times&lt;T&gt; where T: Copy + Mul + Mul&lt;Output = T&gt; {
+    fn new() -&gt; Self {
+        Times {
+            phantom: PhantomData
+        }
+    }
+    fn calc(arg1:T, arg2:T) -&gt; T {
+        arg1 * arg2
+    }
+}
+/*----------------------------------------------------- 
+  Demo uses any Calc type without the need to know
+  which one.  It only needs to know that it's Calc.
+
+  It uses Calc's factory function new() to generate
+  an instance of the calculator function without
+  knowing what type its using.
+
+  So Demo is isolated from calculators implemenation,
+  just depending on the Calc and Copy traits.
+
+    U is the type of a calculator function.
+    T is the type of the calculation data.
+*/
+struct Demo&lt;U,T&gt; where U: Calc&lt;T&gt;, T: Copy + Default {
+    oper: U,
+    result: T
+}
+impl&lt;U,T&gt; Demo&lt;U,T&gt; where U: Calc&lt;T&gt;, T: Copy + Default {
+    fn new() -&gt; Demo&lt;U, T&gt; {
+        Demo {
+           oper: U::new(),
+           result: T::default()
+        }
+    }
+    fn do_calc(&amp;mut self, arg1:T, arg2:T) -&gt; T {
+        self.result = U::calc(arg1, arg2);
+        self.result
+    }
+    fn get_result(&amp;self) -&gt; T {
+        self.result
+    }
+}
+/*----------------------------------------------------- 
+  The executive, main(), needs to have all of the type
+  information. 
+*/
+fn main() {
+    let mut demo = Demo::&lt;Times&lt;i32&gt;, i32&gt;::new();
+    let result = demo.do_calc(21, 2);
+    print!("\n  Times(21, 2) = {:?}", result);
+    print!("\n  saved result = {:?}", demo.get_result());
+    println!();
+
+    let mut demo = Demo::&lt;Plus&lt;f64&gt;, f64&gt;::new();
+    let result = demo.do_calc(21.0, 2.0);
+    print!("\n  Plus(21.0, 2.0) = {:?}", result);
+    print!("\n  saved result    = {:?}", demo.get_result());
+
+    println!("\n\n  That's all Folks!\n\n");
+}
+</pre>

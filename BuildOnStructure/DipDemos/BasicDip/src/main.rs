@@ -26,7 +26,8 @@
 #![allow(dead_code)]
 
 /*-----------------------------------------------
-  
+  Trait Say provides an abstraction that Demo<T>
+  uses to avoid depending on types First and Second.
 */
 pub trait Say {
     fn new() -> Self;  // factory function
@@ -34,7 +35,12 @@ pub trait Say {
     fn get_id(&self) -> u8;
     fn say(&self);
 }
-
+/*-----------------------------------------------
+  First is a component that Demo<T> depends on
+  when the executive declares Demo<First>.
+  Demo's compilation only depends on Say, not
+  on the details of First.
+*/
 pub struct First {
     id: u8
 }
@@ -54,6 +60,12 @@ impl Say for First {
         print!("\n  First here with id = {:?}",self.id);
     }
 }
+/*-----------------------------------------------
+  Second is a component that Demo<T> depends on
+  when the executive declares Demo<Second>.
+  Demo's compilation only depends on Say, not
+  on the details of Second.
+*/
 pub struct Second {
     id: u8
 }
@@ -73,6 +85,11 @@ impl Say for Second {
         print!("\n  Second here with id = {:?}",self.id);
     }
 }
+/*-----------------------------------------------
+  Demo is a high level type that uses low level
+  types First and Second without incurring
+  compilation dependencies on their implementations.
+*/
 struct Demo<T> where T: Say {
     my_say: T
 }
@@ -92,6 +109,15 @@ impl<T> Demo<T> where T: Say {
         self.my_say.say();       // using trait method
     }
 }
+/*-----------------------------------------------
+  main() is the program executive.  It depends 
+  directly on Demo, First, and Second.
+
+  DIP allows a reusable component, which Demo<T>
+  pretends to be, to be used in applications 
+  without any changes, even though the parts
+  it uses through traits change.
+*/
 
 fn main() {
     print!("\n  -- basic_dip demo --\n");

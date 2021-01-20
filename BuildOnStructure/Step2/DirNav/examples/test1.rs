@@ -13,7 +13,7 @@ use dir_nav::*;
   - can be retrieved with DirNav::get_app()
     and interrogated using its member functions.
 */
-struct MyApp {}
+struct MyApp {}  // mock for TextSearch
 
 impl DirEvent for MyApp {
     fn new() -> Self {
@@ -28,7 +28,10 @@ impl DirEvent for MyApp {
 }
 impl MyApp {
     pub fn show_type(&self) {
-        print!("\n  {:?}", std::any::type_name::<MyApp>());
+        print!(
+            "\n  my type is: {:?}", 
+            std::any::type_name::<MyApp>()
+        );
     }
 }
 
@@ -36,7 +39,8 @@ fn main() {
     print!("\n  -- demonstrate mock DirNav --\n");
 
     let mut dn = DirNav::<MyApp>::new();
-    dn.start();
+    let path = std::path::Path("dir1");
+    dn.visit(&path);
     println!();
     dn.get_app().show_type();
 

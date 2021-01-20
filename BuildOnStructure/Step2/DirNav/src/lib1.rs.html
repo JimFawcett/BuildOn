@@ -4,6 +4,7 @@
 // Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
 /////////////////////////////////////////////////////////////
 
+use std::path::{Path};
 
 /*-----------------------------------------------
   Rust traits are similar to interfaces.
@@ -69,13 +70,17 @@ impl&lt;T&gt; DirNav&lt;T&gt; where T:DirEvent {
     pub fn get_app(&amp;self) -&gt; &amp;T {
         &amp;self.app
     }
-    pub fn start(&amp;mut self) {
+    pub fn visit(&amp;mut self, path: &amp;Path) {
         /* pretending to search a dir tree */
-        self.app.do_dir("dir1");
+        let path_string = Self::path_to_string(path);
+        self.app.do_dir(&amp;path_string);
         self.app.do_file("file1");
         self.app.do_file("file2");
         self.app.do_dir("dir2");
         self.app.do_file("file3");
+    }
+    pub fn path_to_string(path:Path) -&gt; String {
+        format!("{}", path)
     }
 }
 

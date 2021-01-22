@@ -21,42 +21,23 @@ pub trait DirEvent {
     /*-- constructible --*/
     fn new() -> Self;
     /*-- event handlers --*/
-    fn do_dir(&mut self, dir:&str);
-    fn do_file(&mut self, file: &str);
+    fn do_dir(&mut self, dir:&Path);
+    fn do_file(&mut self, file: &Path);
 }
-
-//#region : Sample App implementing DirEvent
-/*-----------------------------------------------
-  App is a type that implements application
-  specific processing of a DirEvent sent by
-  DirNav.  This is a demo for the DirNav library
-  that illustrates how an application can use
-  DirNav.
-  -----------------------------------------------
-pub struct App {
-    curr_dir: String
-}
-impl DirEvent for App {
-    fn new() -> Self {
-        App { curr_dir: String::new() }
-    }
-    fn do_dir(&mut self, dir: &str) {
-        print!("\n  directory: {:?}",dir);
-        self.curr_dir = dir.to_string();
-    }
-    fn do_file(&mut self, file: &str) {
-        print!("\n    file: {:?}", file);
-    }
-}
-*/
-//#endregion
 
 /*-----------------------------------------------
   DirNav searches directory tree looking for
   files with specified patterns (extensions).
 
-  This is a mock type defined as an illustration
-  of what Step #2 needs.
+  App is a DirNav member that implements 
+  application specific processing of a 
+  DirEvent sent by DirNav::visit.  
+  
+  See test1.rs in examples directory for an
+  example App type.
+
+  This DirNav is a mock type defined as an 
+  illustration of what Step #2 needs.
 */
 pub struct DirNav<T> where T:DirEvent {
     app : T
@@ -64,7 +45,7 @@ pub struct DirNav<T> where T:DirEvent {
 impl<T> DirNav<T> where T:DirEvent {
     pub fn new() -> DirNav<T> {
         DirNav {
-          app: T::new()
+          app: T::new()  // using factory function
         }
     }
     pub fn get_app(&self) -> &T {
@@ -72,22 +53,50 @@ impl<T> DirNav<T> where T:DirEvent {
     }
     pub fn visit(&mut self, path: &Path) {
         /* pretending to search a dir tree */
-        let path_string = Self::path_to_string(path);
-        self.app.do_dir(&path_string);
-        self.app.do_file("file1");
-        self.app.do_file("file2");
-        self.app.do_dir("dir2");
-        self.app.do_file("file3");
+        self.app.do_dir(path);
+        self.app.do_file(&Path::new("file1"));
+        self.app.do_file(&Path::new("file2"));
+        self.app.do_dir(&Path::new("dir2"));
+        self.app.do_file(&Path::new("file3"));
     }
-    pub fn path_to_string(path:Path) -> String {
-        format!("{}", path)
+    pub fn path_to_string(path:&Path) -> String {
+        format!("{:?}", path)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use std::path::{Path, PathBuf};
+    struct App {
+        test_file: PathBuf,
+        test_dir: PathBuf
+    }
+    impl DirEvent for App {
+        fn new() -> App {
+            App {
+                test_file: PathBuf::from(""),
+                test_dir: PathBuf::from("")
+            }
+        }
+        fn do_dir(&mut self, dir: &Path) {
+            self.test_dir = dir.to_path_buf();
+        }
+        fn do_file(&mut self, file: &Path) {
+            self.test_file = file.to_path_buf();
+        }
+    }
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn test_events() {
+        let mut dn = DirNav::<App>::new();  
+        let test_path = Path::new("test");
+        dn.visit(test_path);
+        let app = dn.get_app();
+        let dir_app:String = format!("{:?}", app.test_dir);
+        let dir_rqt:String = format!("{:?}", "dir2");
+        assert_eq!(dir_app, dir_rqt);   
+        let file_app = format!("{:?}", app.test_file);
+        let file_rqt = format!("{:?}", "file3");
+        assert_eq!(file_app, file_rqt);   
     }
 }

@@ -5,6 +5,7 @@
 /////////////////////////////////////////////////////////////
 
 use dir_nav::*;
+use std::path::{Path};
 
 /*-----------------------------------------------
   Type MyApp is a test type that:
@@ -19,10 +20,10 @@ impl DirEvent for MyApp {
     fn new() -> Self {
         MyApp {}
     }
-    fn do_dir(&mut self, dir:&str) {
+    fn do_dir(&mut self, dir:&Path) {
         print!("\n  directory: {:?}", dir);
     }
-    fn do_file(&mut self, file:&str) {
+    fn do_file(&mut self, file:&Path) {
         print!("\n    file: {:?}", file);
     }
 }
@@ -39,8 +40,8 @@ fn main() {
     print!("\n  -- demonstrate mock DirNav --\n");
 
     let mut dn = DirNav::<MyApp>::new();
-    let path = std::path::Path("dir1");
-    dn.visit(&path);
+    let path = &Path::new("dir1");
+    dn.visit(path);
     println!();
     dn.get_app().show_type();
 

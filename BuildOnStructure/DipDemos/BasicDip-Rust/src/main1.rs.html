@@ -26,7 +26,8 @@
 #![allow(dead_code)]
 
 /*-----------------------------------------------
-  
+  Trait Say provides an abstraction that Demo&lt;T&gt;
+  uses to avoid depending on types First and Second.
 */
 pub trait Say {
     fn new() -&gt; Self;  // factory function
@@ -34,7 +35,12 @@ pub trait Say {
     fn get_id(&amp;self) -&gt; u8;
     fn say(&amp;self);
 }
-
+/*-----------------------------------------------
+  First is a component that Demo&lt;T&gt; depends on
+  when the executive declares Demo&lt;First&gt;.
+  Demo's compilation only depends on Say, not
+  on the details of First.
+*/
 pub struct First {
     id: u8
 }
@@ -54,6 +60,12 @@ impl Say for First {
         print!("\n  First here with id = {:?}",self.id);
     }
 }
+/*-----------------------------------------------
+  Second is a component that Demo&lt;T&gt; depends on
+  when the executive declares Demo&lt;Second&gt;.
+  Demo's compilation only depends on Say, not
+  on the details of Second.
+*/
 pub struct Second {
     id: u8
 }
@@ -73,6 +85,11 @@ impl Say for Second {
         print!("\n  Second here with id = {:?}",self.id);
     }
 }
+/*-----------------------------------------------
+  Demo is a high level type that uses low level
+  types First and Second without incurring
+  compilation dependencies on their implementations.
+*/
 struct Demo&lt;T&gt; where T: Say {
     my_say: T
 }
@@ -92,16 +109,25 @@ impl&lt;T&gt; Demo&lt;T&gt; where T: Say {
         self.my_say.say();       // using trait method
     }
 }
+/*-----------------------------------------------
+  main() is the program executive.  It depends 
+  directly on Demo, First, and Second.
+
+  DIP allows a reusable component, which Demo&lt;T&gt;
+  pretends to be, to be used in applications 
+  without any changes, even though the parts
+  it uses through traits change.
+*/
 
 fn main() {
     print!("\n  -- basic_dip demo --\n");
 
-    let mut first = Demo::&lt;First&gt;::new();
-    first.set_id(1);
-    first.say_it();
-    let mut second = Demo::&lt;Second&gt;::new();
-    second.set_id(2);
-    second.say_it();
+    let mut demo = Demo::&lt;First&gt;::new();
+    demo.set_id(1);
+    demo.say_it();
+    let mut demo = Demo::&lt;Second&gt;::new();
+    demo.set_id(2);
+    demo.say_it();
     println!("\n\n  That's all Folks!\n\n");
 }
 </pre>

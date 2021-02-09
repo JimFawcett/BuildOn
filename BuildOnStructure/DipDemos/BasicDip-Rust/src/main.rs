@@ -122,11 +122,11 @@ impl<T> Demo<T> where T: Say {
 fn main() {
     print!("\n  -- basic_dip demo --\n");
 
-    let mut first = Demo::<First>::new();
-    first.set_id(1);
-    first.say_it();
-    let mut second = Demo::<Second>::new();
-    second.set_id(2);
-    second.say_it();
+    let mut demo = Demo::<First>::new();
+    demo.set_id(1);
+    demo.say_it();
+    let mut demo = Demo::<Second>::new();
+    demo.set_id(2);
+    demo.say_it();
     println!("\n\n  That's all Folks!\n\n");
 }

@@ -1,0 +1,133 @@
+<pre>/////////////////////////////////////////////////////////////
+// basic_dip::main.rs                                      //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 19 Jan 2021  //
+/////////////////////////////////////////////////////////////
+/*
+    Demonstrates Dependency Inversion Principle:
+      "High level modules should not depend on
+       low level modules.  Both should depend
+       on abstractions."
+
+    This demonstration builds a basic demo with self
+    annunciating low level components.
+    
+      - High level part: Demo&lt;T&gt;
+      - Low level parts: First, Second
+      - Abstraction defined in this package: 
+        - trait Say
+    The definitons of First and Second could be
+    changed in any way that is compatible with 
+    trait Say without affecting compilation of
+    Demo&lt;T&gt;.
+*/
+
+
+#![allow(dead_code)]
+
+/*-----------------------------------------------
+  Trait Say provides an abstraction that Demo&lt;T&gt;
+  uses to avoid depending on types First and Second.
+*/
+pub trait Say {
+    fn new() -&gt; Self;  // factory function
+    fn set_id(&amp;mut self, id: u8);
+    fn get_id(&amp;self) -&gt; u8;
+    fn say(&amp;self);
+}
+/*-----------------------------------------------
+  First is a component that Demo&lt;T&gt; depends on
+  when the executive declares Demo&lt;First&gt;.
+  Demo's compilation only depends on Say, not
+  on the details of First.
+*/
+pub struct First {
+    id: u8
+}
+impl Say for First {
+    fn new() -&gt; First {
+        First {
+            id: 0
+        }
+    }
+    fn set_id(&amp;mut self, id: u8) {
+        self.id = id;
+    }
+    fn get_id(&amp;self) -&gt; u8 {
+        self.id
+    }
+    fn say(&amp;self) {
+        print!("\n  First here with id = {:?}",self.id);
+    }
+}
+/*-----------------------------------------------
+  Second is a component that Demo&lt;T&gt; depends on
+  when the executive declares Demo&lt;Second&gt;.
+  Demo's compilation only depends on Say, not
+  on the details of Second.
+*/
+pub struct Second {
+    id: u8
+}
+impl Say for Second {
+    fn new() -&gt; Second {
+        Second {
+            id: 0
+        }
+    }
+    fn set_id(&amp;mut self, id: u8) {
+        self.id = id;
+    }
+    fn get_id(&amp;self) -&gt; u8 {
+        self.id
+    }
+    fn say(&amp;self) {
+        print!("\n  Second here with id = {:?}",self.id);
+    }
+}
+/*-----------------------------------------------
+  Demo is a high level type that uses low level
+  types First and Second without incurring
+  compilation dependencies on their implementations.
+*/
+struct Demo&lt;T&gt; where T: Say {
+    my_say: T
+}
+impl&lt;T&gt; Demo&lt;T&gt; where T: Say {
+    fn new() -&gt; Demo&lt;T&gt; {
+        Demo {
+            my_say: T::new()  // using factory function
+        }
+    }
+    fn set_id(&amp;mut self, id:u8) {
+        self.my_say.set_id(id);  // using trait method
+    }
+    fn get_id(&amp;self) -&gt; u8 {
+        self.my_say.get_id()     // using trait method
+    }
+    fn say_it(&amp;self) {
+        self.my_say.say();       // using trait method
+    }
+}
+/*-----------------------------------------------
+  main() is the program executive.  It depends 
+  directly on Demo, First, and Second.
+
+  DIP allows a reusable component, which Demo&lt;T&gt;
+  pretends to be, to be used in applications 
+  without any changes, even though the parts
+  it uses through traits change.
+*/
+
+fn main() {
+    print!("\n  -- basic_dip demo --\n");
+
+    let mut demo = Demo::&lt;First&gt;::new();
+    demo.set_id(1);
+    demo.say_it();
+    let mut demo = Demo::&lt;Second&gt;::new();
+    demo.set_id(2);
+    demo.say_it();
+    println!("\n\n  That's all Folks!\n\n");
+}
+</pre>

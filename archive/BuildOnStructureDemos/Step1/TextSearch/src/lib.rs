@@ -4,8 +4,6 @@
 // Jim Fawcett, https://JimFawcett.github.io, 14 Jan 21  //
 ///////////////////////////////////////////////////////////
 
-use std::path::{Path, PathBuf};
-
 /*-----------------------------------------------
   A trait is similar to an interface, most often
   used to convey a communication protocol for
@@ -15,8 +13,8 @@ use std::path::{Path, PathBuf};
   Step #4
 */
 pub trait SearchEvent {
-    fn set_dir(&mut self, dir: &Path);
-    fn set_file(&mut self, rslt: (&Path, bool, &str));
+    fn set_dir(&mut self, dir: &str);
+    fn set_file(&mut self, rslt: (&str, bool, &str));
 }
 /*-----------------------------------------------
   GenOut converts Finder's data into information
@@ -24,21 +22,21 @@ pub trait SearchEvent {
 */
 #[derive(Debug)]
 pub struct GenOut {
-    dir: PathBuf
+    dir: String
 }
 /*-- implement trait --------------------------*/
 impl SearchEvent for GenOut {
-    fn set_dir(&mut self, rdir: &Path) {
-        self.dir = rdir.to_path_buf();
-        print!("\n  {:?}", rdir);
+    fn set_dir(&mut self, rdir: &str) {
+        self.dir = rdir.to_string();
+        print!("\n  {}", rdir);
     }
-    fn set_file(&mut self, rslt: (&Path, bool, &str)) {
+    fn set_file(&mut self, rslt: (&str, bool, &str)) {
         let (file, found, text) = rslt;
         if found {
-            print!("\n    {:?}: {:?} found", file, text);
+            print!("\n    {}: {:?} found", file, text);
         }
         else {
-            print!("\n    {:?}: {:?} not found", file, text);
+            print!("\n    {}: {:?} not found", file, text);
         }
     }
 }
@@ -46,7 +44,7 @@ impl SearchEvent for GenOut {
 impl GenOut {
     pub fn new() -> GenOut {
         GenOut {
-            dir: PathBuf::new()
+            dir: String::new()
         }
     }
 }
@@ -57,25 +55,25 @@ impl GenOut {
   Not used in this step.
 */
 pub trait DirEvent {
-    fn do_dir(&mut self, dir: &Path);
-    fn do_file(&mut self, file: &Path);
+    fn do_dir(&mut self, dir: &str);
+    fn do_file(&mut self, file: &str);
 }
 /*-----------------------------------------------
   Finder searches for text in specified file
 */
 #[derive(Debug)]
 pub struct Finder {
-      dir: PathBuf,
+      dir: String,
       srctxt: String,
       out: GenOut
 }
 /*-- implement DirEvent --*/
 impl DirEvent for Finder {
-    fn do_dir(&mut self, dir: &Path) {
-        self.dir = dir.to_path_buf();
+    fn do_dir(&mut self, dir: &str) {
+        self.dir = dir.to_string();
         self.out.set_dir(dir);
     }
-    fn do_file(&mut self, file: &Path) {
+    fn do_file(&mut self, file: &str) {
         /* 
             Pretending to search for text in file.
             Function should:
@@ -96,7 +94,7 @@ impl DirEvent for Finder {
 impl Finder {
     pub fn new() -> Finder {
         Finder {
-            dir: PathBuf::new(),
+            dir: String::new(),
             srctxt: String::new(),
             out: GenOut::new()
         }
@@ -112,11 +110,11 @@ mod tests {
     #[test]
     fn construct_genout() {
         let g = GenOut::new();
-        assert_eq!(g.dir , PathBuf::from(""));
+        assert_eq!(g.dir , "".to_string());
     }
     #[test]
     fn construct_finder() {
         let f = Finder::new();
-        assert_eq!(f.dir,  PathBuf::from(""));
+        assert_eq!(f.dir, "".to_string());
     }
 }

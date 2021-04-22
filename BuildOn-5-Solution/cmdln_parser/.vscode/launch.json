@@ -1,0 +1,64 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'cmdln_parser'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=cmdln_parser"
+                ],
+                "filter": {
+                    "name": "cmdln_parser",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'test1'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=test1",
+                    "--package=cmdln_parser"
+                ],
+                "filter": {
+                    "name": "test1",
+                    "kind": "example"
+                }
+            },
+            "args": ["/arg1", "ab", "/arg2", "c", "d", "/arg3"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'test1'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=test1",
+                    "--package=cmdln_parser"
+                ],
+                "filter": {
+                    "name": "test1",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

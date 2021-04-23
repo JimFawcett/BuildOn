@@ -4,21 +4,19 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
-
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'integration'",
+            "name": "Debug unit tests in library 'cmdln_parser'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=integration"
+                    "--package=cmdln_parser"
                 ],
                 "filter": {
-                    "name": "integration",
+                    "name": "cmdln_parser",
                     "kind": "lib"
                 }
             },
@@ -33,32 +31,14 @@
                 "args": [
                     "build",
                     "--example=test1",
-                    "--package=integration"
+                    "--package=cmdln_parser"
                 ],
                 "filter": {
                     "name": "test1",
                     "kind": "example"
                 }
             },
-            "args": ["/H", "false"],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug example 'test2'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--example=test2",
-                    "--package=integration"
-                ],
-                "filter": {
-                    "name": "test2",
-                    "kind": "example"
-                }
-            },
-            "args": ["/H", "true"],
+            "args": ["/arg1", "ab", "/arg2", "c", "d", "/arg3"],
             "cwd": "${workspaceFolder}"
         },
         {
@@ -70,7 +50,7 @@
                     "test",
                     "--no-run",
                     "--example=test1",
-                    "--package=integration"
+                    "--package=cmdln_parser"
                 ],
                 "filter": {
                     "name": "test1",

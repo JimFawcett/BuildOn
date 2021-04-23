@@ -56,7 +56,7 @@ impl Executive {
             for arg in iter.skip(1) {
                 print!("{} ", arg);
             }
-            print!("\n  Parsed attributes:");
+            print!("\n\n  Parsed attributes:");
             for arg in attrib {
                 print!("\n    {:?}", arg);
             }
@@ -121,44 +121,9 @@ impl Executive {
             }
         }
         "".to_string()
-    }
-    /*-- return reference to CmdParser --*/
-    pub fn get_cparser(&mut self) -> &mut CmdParser {
-        &mut self.cp
-    }
-    /*---------------------------------------------------------
-      Add attribute-value pair: example p-h.  Works for both
-      cases:
-      - attribute does not exist
-      - attribute exists and has vector of values
-    */
-    pub fn set_attribute_item(&mut self, attr: &str, val: &str) {
-        self.set_default(attr, val);
-        if let Some(value) = self.cp.get_mut(attr) {
-            value.push(val.to_string());
-        }
-    } 
-    /*---------------------------------------------------------
-      Set default for attribute-value pair.  Does nothing if
-      attribute already exists.
-    */
-    pub fn set_default(&mut self, attr: &str, val: &str) {
-        self.cp.set_default(attr, val);
-        if attr.contains("p") {
-            self.dn.add_patt(Path::new(val));
-        }
-        if let Some(vec) = self.cp.get("v") {
-            if vec[0].contains("true") {
-                print!("\n  added (key, val) = {:?}", (attr, val));
-            }
-        }
-    }
-    /*---------------------------------------------------------
-      Called after parsing command line, won't replace existing. 
-      Client may add additional default with set_default, or
-      set_attribute_item.
-    */
-    fn set_defaults(&mut self) {
+    }    
+    /*-- call after parsing command line, won't replace existing --*/
+    pub fn set_defaults(&mut self) {
         self.cp.set_default("P", ".");       // Path
         self.cp.set_default("s", "true");    // recurse
         self.cp.set_default("H", "true");    // hide unmatched

@@ -23,9 +23,7 @@ fn main() {
     if !ex.process_cmdln() {
         return;
     }
-    else {
-      ex.set_attribute_item("p", "rs");
-    }
+
     /* start searching dir tree rooted at specified path */
     if !ex.start() {
         print!("\n  can't start dir nav\n");

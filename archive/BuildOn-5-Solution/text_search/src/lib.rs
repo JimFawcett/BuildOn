@@ -69,7 +69,7 @@ impl<T: SearchEvent> Finder<T> {
     /*-- called by Executive based on Cmdln opts --*/
     pub fn set_txt(&mut self, srctxt: &str) {
         self.txt = srctxt.to_string();
-        print!("\n  searching for text: {:?}", self.txt);
+        print!("\n\n  searching for text: {:?}", self.txt);
     }
     /*-- called by Executive to config GenOut --*/
     pub fn get_app(&mut self) -> &mut T {

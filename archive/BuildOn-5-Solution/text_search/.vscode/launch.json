@@ -4,21 +4,21 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
-
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'integration'",
+            "name": "Debug unit tests in library 'text_search'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=integration"
+                    "--",
+                    "--test-threads 1",
+                    "--package=text_search"
                 ],
                 "filter": {
-                    "name": "integration",
+                    "name": "text_search",
                     "kind": "lib"
                 }
             },
@@ -33,32 +33,14 @@
                 "args": [
                     "build",
                     "--example=test1",
-                    "--package=integration"
+                    "--package=text_search"
                 ],
                 "filter": {
                     "name": "test1",
                     "kind": "example"
                 }
             },
-            "args": ["/H", "false"],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug example 'test2'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--example=test2",
-                    "--package=integration"
-                ],
-                "filter": {
-                    "name": "test2",
-                    "kind": "example"
-                }
-            },
-            "args": ["/H", "true"],
+            "args": [],
             "cwd": "${workspaceFolder}"
         },
         {
@@ -70,7 +52,7 @@
                     "test",
                     "--no-run",
                     "--example=test1",
-                    "--package=integration"
+                    "--package=text_search"
                 ],
                 "filter": {
                     "name": "test1",

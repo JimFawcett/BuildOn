@@ -12,6 +12,7 @@ use text_search::{Finder};
 use display::{GenOut};
 use cmdln_parser::{CmdParser};
 use std::path::{Path, PathBuf};
+use std::collections::hash_map::{Entry};
 
 /*---------------------------------------------------------
   Executive type
@@ -77,6 +78,12 @@ impl Executive {
                 self.dn.get_app().set_txt(&txts[0]);
             }
         }
+
+        if let Some(recur) = self.cp.get("s") {
+            if !recur.is_empty() && recur[0].as_str() == "false" {
+                self.dn.recurse(false);
+            }
+        }
     
         /* get GenOut */
         let out = self.dn.get_app().get_app();
@@ -98,7 +105,7 @@ impl Executive {
         /* apply Debug ouput attribute */
         if let Some(outs) = self.cp.get("D") {
             if !outs.is_empty() {
-                let do_debug: bool = outs[0] == *"true";
+                let do_debug: bool = outs[0].as_str() == "true";
                 out.set_debug(do_debug);
                 if do_debug {
                     /* show Finder instance */
@@ -123,7 +130,11 @@ impl Executive {
         "".to_string()
     }
     /*-- return reference to CmdParser --*/
-    pub fn get_cparser(&mut self) -> &mut CmdParser {
+    pub fn get_cparser(&self) -> &CmdParser {
+        &self.cp
+    }
+    /*-- return reference to CmdParser --*/
+    pub fn get_cparser_mut(&mut self) -> &mut CmdParser {
         &mut self.cp
     }
     /*---------------------------------------------------------
@@ -133,9 +144,47 @@ impl Executive {
       - attribute exists and has vector of values
     */
     pub fn set_attribute_item(&mut self, attr: &str, val: &str) {
-        self.set_default(attr, val);
-        if let Some(value) = self.cp.get_mut(attr) {
-            value.push(val.to_string());
+        let vs = val.to_string();
+        if attr == "p" {
+            let hm = &mut self.cp;
+            if hm.contains_key("p") {
+                if let Some(v) = hm.get_mut("p") {
+                    if !v.contains(&vs) {
+                        self.dn.add_patt(&Path::new(val));
+                        v.push(vs);
+                        print!("\n  added item {:?}", (attr, val));
+                    }
+                }
+            }
+            else {
+                hm.insert(attr, val);
+                self.dn.add_patt(&Path::new(val));
+                print!("\n  added item {:?}", (attr, val));
+            }
+        }
+        else {
+            let hm = self.cp.get_parse_mut();
+            let entry = hm.entry(attr.to_string());
+            if let Entry::Occupied(mut rentry) = entry {
+                let v: &mut Vec<String> = rentry.get_mut();
+                if v.is_empty() {
+                    v.push(vs);
+                    print!("\n  added item {:?}", (attr, val));
+                }
+                else if v[0].as_str() == "true" 
+                     || v[0].as_str() == "false" {
+                    v[0] = vs;
+                    print!("\n  added item {:?}", (attr, val));
+                }
+                else {
+                    v.push(vs);
+                    print!("\n  added item {:?}", (attr, val));
+                }
+            }
+            else {
+                hm.insert(attr.to_string(), vec![vs]);
+                print!("\n  added item {:?}", (attr, val));
+            }
         }
     } 
     /*---------------------------------------------------------
@@ -144,8 +193,9 @@ impl Executive {
     */
     pub fn set_default(&mut self, attr: &str, val: &str) {
         self.cp.set_default(attr, val);
-        if attr.contains("p") {
-            self.dn.add_patt(Path::new(val));
+        // if attr.contains('p') {
+        if attr == "p" {
+                self.dn.add_patt(Path::new(val));
         }
         if let Some(vec) = self.cp.get("v") {
             if vec[0].contains("true") {

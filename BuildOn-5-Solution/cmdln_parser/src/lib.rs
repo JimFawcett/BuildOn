@@ -81,6 +81,9 @@ impl CmdParser {
     pub fn get_parse(&self) -> &HashMap<String, Vec<String>> {
         &self.attrib
     }
+    pub fn get_parse_mut(&mut self) -> &mut HashMap<String, Vec<String>> {
+        &mut self.attrib
+    }
     pub fn get_args(&self) -> &Vec<String> {
         &self.args
     }
@@ -159,7 +162,7 @@ pub fn show_args(cp: &CmdParser) -> String {
     temp
 }
 
-pub fn show_parse(cp: &CmdParser) -> String {
+pub fn show_parse(cp: &mut CmdParser) -> String {
     let prefix = "\n    ";
     let mut temp = "\n  cmdln parse:".to_string();
     let iter = cp.get_parse().iter();

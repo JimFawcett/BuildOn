@@ -48,7 +48,7 @@ impl Executive {
         /* set default values if not specified */
         self.set_defaults();
     
-        let attrib = self.cp.get_parse();
+        let _attrib = self.cp.get_parse();
         
         /* verbose option */
         if self.get_first("v") == "true" {
@@ -57,10 +57,10 @@ impl Executive {
             for arg in iter.skip(1) {
                 print!("{} ", arg);
             }
-            print!("\n  Parsed attributes:");
-            for arg in attrib {
-                print!("\n    {:?}", arg);
-            }
+            // print!("\n  Parsed attributes:");
+            // for arg in _attrib {
+            //     print!("\n    {:?}", arg);
+            // }
             println!();
         }
     
@@ -91,14 +91,15 @@ impl Executive {
         /* apply Hidden attribute */
         if let Some(hides) = self.cp.get("H") {
             if !hides.is_empty() {
-                out.set_hide_unmatched(hides[0] == *"true");
+                out.set_hide_unmatched(hides[0].as_str() == "true");
+                // out.set_hide_unmatched(hides[0] == *"true");
             }
         }
     
         /* apply show All attribute, both matched and unmatched */
         if let Some(outs) = self.cp.get("A") {
             if !outs.is_empty() {
-                out.show_all(outs[0] == *"true");
+                out.show_all(outs[0].as_str() == "true");
             }
         }
     
@@ -152,14 +153,14 @@ impl Executive {
                     if !v.contains(&vs) {
                         self.dn.add_patt(&Path::new(val));
                         v.push(vs);
-                        print!("\n  added item {:?}", (attr, val));
+                        // print!("\n  added item {:?}", (attr, val));
                     }
                 }
             }
             else {
                 hm.insert(attr, val);
                 self.dn.add_patt(&Path::new(val));
-                print!("\n  added item {:?}", (attr, val));
+                // print!("\n  added item {:?}", (attr, val));
             }
         }
         else {
@@ -169,21 +170,21 @@ impl Executive {
                 let v: &mut Vec<String> = rentry.get_mut();
                 if v.is_empty() {
                     v.push(vs);
-                    print!("\n  added item {:?}", (attr, val));
+                    // print!("\n  added item {:?}", (attr, val));
                 }
                 else if v[0].as_str() == "true" 
                      || v[0].as_str() == "false" {
                     v[0] = vs;
-                    print!("\n  added item {:?}", (attr, val));
+                    // print!("\n  added item {:?}", (attr, val));
                 }
                 else {
                     v.push(vs);
-                    print!("\n  added item {:?}", (attr, val));
+                    // print!("\n  added item {:?}", (attr, val));
                 }
             }
             else {
                 hm.insert(attr.to_string(), vec![vs]);
-                print!("\n  added item {:?}", (attr, val));
+                // print!("\n  added item {:?}", (attr, val));
             }
         }
     } 
@@ -193,7 +194,6 @@ impl Executive {
     */
     pub fn set_default(&mut self, attr: &str, val: &str) {
         self.cp.set_default(attr, val);
-        // if attr.contains('p') {
         if attr == "p" {
                 self.dn.add_patt(Path::new(val));
         }

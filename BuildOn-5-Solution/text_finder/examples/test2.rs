@@ -6,8 +6,10 @@
 /*
   This version uses Executive struct.  Prefer this test2.rs
 */
+#![allow(unused_imports)]
 
 use integration::{Executive};
+use cmdln_parser::{show_parse};
 
 fn main() {
     print!("\n  -- TextFinder, v1.0 --\n");
@@ -24,7 +26,13 @@ fn main() {
         return;
     }
     else {
-      ex.set_attribute_item("p", "rs");
+        // ex.set_attribute_item("p", "rs");
+        let cp = ex.get_cparser();
+        if let Some(vec) = cp.get("v") {
+            if vec[0] == "true" {
+                print!("{}\n", show_parse(ex.get_cparser_mut()));
+            }
+        }
     }
     /* start searching dir tree rooted at specified path */
     if !ex.start() {

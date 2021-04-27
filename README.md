@@ -2,6 +2,8 @@
 
 https://JimFawcett.github.io/BuildOn.html
 
+<img src="TextFinderClassDiagram2.jpg" width="400" />
+
 Home for remote collaboration on learning Rust (other languages later)
 - Repository now contains starter code for Steps #1 and #2.
 - After each remote session I will put my solution code here as well.  

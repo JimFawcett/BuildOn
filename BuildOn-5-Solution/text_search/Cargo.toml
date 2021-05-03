@@ -10,4 +10,5 @@ edition = "2018"
 doctest = false
 
 [dependencies]
+regex = "1"
 dir_nav = { path = "../dir_nav" }

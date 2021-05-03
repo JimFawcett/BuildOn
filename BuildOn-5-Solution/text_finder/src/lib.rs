@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 // text_finder::lib.rs - search dir tree for files with text //
-// ver 1.0                                                   //
+// ver 1.1                                                   //
 // Jim Fawcett, https://JimFawcett.github.io, 22 Feb 2021    //
 ///////////////////////////////////////////////////////////////
 
@@ -10,7 +10,7 @@
 use dir_nav::{DirNav, replace_sep};
 use text_search::{Finder};
 use display::{GenOut};
-use cmdln_parser::{CmdParser};
+use cmdln_parser::{CmdParser, show_parse};
 use std::path::{Path, PathBuf};
 use std::collections::hash_map::{Entry};
 
@@ -57,14 +57,12 @@ impl Executive {
             for arg in iter.skip(1) {
                 print!("{} ", arg);
             }
-            // print!("\n  Parsed attributes:");
-            // for arg in _attrib {
-            //     print!("\n    {:?}", arg);
-            // }
+            println!();
+            print!("{}",show_parse(&mut self.cp));
             println!();
         }
     
-        /* apply patterns */
+        /* apply patterns - file exts without the '.' */
         if let Some(pats) = self.cp.get("p") {
             for pat in pats {
                 let p = Path::new(pat);
@@ -76,6 +74,19 @@ impl Executive {
         if let Some(txts) = self.cp.get("T") {
             if !txts.is_empty() {
                 self.dn.get_app().set_txt(&txts[0]);
+                if !&txts[0].is_empty() {
+                    print!("\n  searching for text: {:?}", txts[0]);
+                }
+            }
+        }
+
+        /* set search regex in Finder */
+        if let Some(txts) = self.cp.get("R") {
+            if !txts.is_empty() {
+                self.dn.get_app().set_regex(&txts[0]);
+                if !&txts[0].is_empty() {
+                    print!("\n  searching with regex: {:?}", txts[0]);
+                }
             }
         }
 
@@ -92,7 +103,6 @@ impl Executive {
         if let Some(hides) = self.cp.get("H") {
             if !hides.is_empty() {
                 out.set_hide_unmatched(hides[0].as_str() == "true");
-                // out.set_hide_unmatched(hides[0] == *"true");
             }
         }
     
@@ -153,14 +163,14 @@ impl Executive {
                     if !v.contains(&vs) {
                         self.dn.add_patt(&Path::new(val));
                         v.push(vs);
-                        // print!("\n  added item {:?}", (attr, val));
+                        // debug: print!("\n  added item {:?}", (attr, val));
                     }
                 }
             }
             else {
                 hm.insert(attr, val);
                 self.dn.add_patt(&Path::new(val));
-                // print!("\n  added item {:?}", (attr, val));
+                // debug: print!("\n  added item {:?}", (attr, val));
             }
         }
         else {
@@ -170,21 +180,21 @@ impl Executive {
                 let v: &mut Vec<String> = rentry.get_mut();
                 if v.is_empty() {
                     v.push(vs);
-                    // print!("\n  added item {:?}", (attr, val));
+                    // debug: print!("\n  added item {:?}", (attr, val));
                 }
                 else if v[0].as_str() == "true" 
                      || v[0].as_str() == "false" {
                     v[0] = vs;
-                    // print!("\n  added item {:?}", (attr, val));
+                    // debug: print!("\n  added item {:?}", (attr, val));
                 }
                 else {
                     v.push(vs);
-                    // print!("\n  added item {:?}", (attr, val));
+                    // debug: print!("\n  added item {:?}", (attr, val));
                 }
             }
             else {
                 hm.insert(attr.to_string(), vec![vs]);
-                // print!("\n  added item {:?}", (attr, val));
+                // debug: print!("\n  added item {:?}", (attr, val));
             }
         }
     } 
@@ -213,7 +223,7 @@ impl Executive {
         self.cp.set_default("s", "true");    // recurse
         self.cp.set_default("H", "true");    // hide unmatched
         self.cp.set_default("v", "true");    // verbose
-        self.cp.set_default("T", " ");       // Text to find
+        self.cp.set_default("T", "");        // Text to find
         self.cp.set_default("D", "false");   // Debug out
         self.cp.set_default("A", "false");
     }
@@ -226,6 +236,7 @@ impl Executive {
         hm.push_str("\n  /P .         => start path is \".\"");
         hm.push_str("\n  /p rs h cpp  => patterns are \"rs\", \"h\", \"cpp\"");
         hm.push_str("\n  /T abc       => search text is \"abc\"");
+        hm.push_str("\n  /R abc       => regex is \"abc\"");
         hm.push_str("\n  /s true      => recursive search");
         hm.push_str("\n  /H true      => hide dirs with no matches");
         hm.push_str("\n  /v true      => verbose - show parse");
@@ -250,7 +261,7 @@ impl Executive {
     /* start DirNav at specified path */
     pub fn start(&mut self) -> bool {
         if let Ok(curr_dir) = std::env::current_dir() {
-            print!("\n  current directory:\n  {:?}", replace_sep(&curr_dir));
+            print!("\n  current directory:\n    {:?}", replace_sep(&curr_dir));
         }
         if let Some(paths) = self.cp.get("P") {
             let mut path_string = String::new();
@@ -258,7 +269,7 @@ impl Executive {
                 path_string = paths[0].clone();
             }
             let start_path = Path::new(&path_string);
-            print!("\n  start path:\n  {:?}\n", self.to_abs_path(start_path));
+            print!("\n  start path:\n    {:?}\n", self.to_abs_path(start_path));
             let rslt = self.dn.visit(start_path);
             println!();
             match rslt {

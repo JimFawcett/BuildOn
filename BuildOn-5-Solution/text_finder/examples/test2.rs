@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////////////////////
 // text_finder::test2.rs - search dir tree for files with text //
-// ver 1.0                                                     //
+// ver 1.1                                                     //
 // Jim Fawcett, https://JimFawcett.github.io, 22 Feb 2021      //
 /////////////////////////////////////////////////////////////////
 /*
-  This version uses Executive struct.  Prefer this test2.rs
+  test2.rs uses Executive struct.  Prefer this over test1.rs
 */
 #![allow(unused_imports)]
 
@@ -12,7 +12,7 @@ use integration::{Executive};
 use cmdln_parser::{show_parse};
 
 fn main() {
-    print!("\n  -- TextFinder, v1.0 --\n");
+    print!("\n  -- TextFinder, v1.1 --\n");
 
     /*-----------------------------------------------------
       set up processing pipeline:
@@ -26,13 +26,11 @@ fn main() {
         return;
     }
     else {
+        /*-------------------------------------------------
+           Uncomment next code line if you want rs to be 
+           default pattern
+        -------------------------------------------------*/
         // ex.set_attribute_item("p", "rs");
-        let cp = ex.get_cparser();
-        if let Some(vec) = cp.get("v") {
-            if vec[0] == "true" {
-                print!("{}\n", show_parse(ex.get_cparser_mut()));
-            }
-        }
     }
     /* start searching dir tree rooted at specified path */
     if !ex.start() {

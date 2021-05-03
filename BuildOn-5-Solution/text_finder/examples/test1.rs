@@ -48,7 +48,10 @@ fn get_first(key: &str, cp: &CmdParser) -> String {
 fn main() {
     let put_msg = |msg:&str| print!("\n  -- {:?} --", msg);
     put_msg("TextFinder, v1.0");
-
+    put_msg("This is early version");
+    put_msg("prefer test2.rs");
+    println!();
+    
     let mut cp = CmdParser::new();
     cp.parse();
     cp.empty_values_to_true();

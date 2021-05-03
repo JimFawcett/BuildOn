@@ -14,3 +14,4 @@ cmdln_parser = { path = "../cmdln_parser" }
 dir_nav = { path = "../dir_nav" }
 text_search = { path = "../text_search" }
 display = { path = "../display" }
+regex = "1"

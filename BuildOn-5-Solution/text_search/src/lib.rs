@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////////////////
 // TextFinder::text_search::lib.rs                         //
 //   - find specified text in file                         //
+//   - ver 1/1                                             //
 // Jim Fawcett, https://JimFawcett.github.io, 26 Oct 2020  //
 /////////////////////////////////////////////////////////////
 
@@ -8,6 +9,7 @@ use std::path::{Path, PathBuf};
 use std::fs::{OpenOptions};
 use std::io::*;
 use dir_nav::{DirEvent};
+use regex::Regex;
 
 pub trait SearchEvent {
     fn new() -> Self;
@@ -30,14 +32,18 @@ pub trait SearchEvent {
 #[derive(Debug, Default)]
 pub struct Finder<T: SearchEvent> {
     dir : PathBuf,
-    txt : String,
+    stxt : String,
+    regx : Option<Regex>,
+    rtxt : String,
     out : T
 }
 impl<T: SearchEvent> DirEvent for Finder<T> {
     fn new() -> Self {
         Self {
             dir: PathBuf::from("."),
-            txt: String::new(),
+            stxt: String::new(),
+            regx: None,
+            rtxt: String::new(),
             out: T::new()
         }
     }
@@ -52,7 +58,7 @@ impl<T: SearchEvent> DirEvent for Finder<T> {
         let path = path.join(file_name);
         let rslt = OpenOptions::new().read(true).open(path);
         if rslt.is_err() {
-            self.out.set_file((file_name,false,&self.txt));
+            self.out.set_file((file_name,false,"can't open file"));
             return;
         }
         let mut file = rslt.unwrap();
@@ -60,16 +66,30 @@ impl<T: SearchEvent> DirEvent for Finder<T> {
         let mut buffer = String::new();
         let rslt = file.read_to_string(&mut buffer);
         if rslt.is_ok() {
-            let found:bool = buffer.contains(&self.txt);
-            self.out.set_file((file_name,found,&self.txt));
+            if self.rtxt.is_empty() {
+                let found:bool = buffer.contains(&self.stxt);
+                self.out.set_file((file_name,found,&self.stxt));
+            }
+            else {
+                let re_opt = &mut self.regx;
+                if let Some(re) = re_opt {
+                    let found:bool = re.is_match(buffer.as_str());
+                    self.out.set_file((file_name,found,&self.stxt));
+                }
+            }
         }
     }
 }
 impl<T: SearchEvent> Finder<T> {
     /*-- called by Executive based on Cmdln opts --*/
     pub fn set_txt(&mut self, srctxt: &str) {
-        self.txt = srctxt.to_string();
-        print!("\n  searching for text: {:?}", self.txt);
+        self.stxt = srctxt.to_string();
+    }
+    /*-- called by Executive based on Cmdln opts --*/
+    pub fn set_regex(&mut self, regex: &str) {
+        self.rtxt = regex.to_string();
+        let re = Regex::new(regex).expect("unvalid regex");
+        self.regx = Some(re);
     }
     /*-- called by Executive to config GenOut --*/
     pub fn get_app(&mut self) -> &mut T {

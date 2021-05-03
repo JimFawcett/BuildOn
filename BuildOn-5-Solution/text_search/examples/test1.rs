@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////
 // test1.rs - demonstrate text_search                      //
-//                                                         //
+// ver 1.1                                                 //
 // Jim Fawcett, https://JimFawcett.github.io, 20 Jan 2021  //
 /////////////////////////////////////////////////////////////
 
@@ -83,19 +83,43 @@ impl GenOut {
     }
 }
 
-fn main() {
-    print!("\n  {}","-- demo text_search --");
-
+fn find_text(t:&str) {
+    print!("\n  -- testing find text --");
+    print!("\n  searching for text: {:?}", t);
     let mut ts = Finder::<GenOut>::new();
-    ts.set_txt("DirEvent");
+    ts.set_txt(t);
     ts.do_dir(&Path::new(".\\src"));
     ts.do_file(&Path::new("lib.rs"));
+    ts.do_dir(&Path::new(".\\examples"));
+    ts.do_file(&Path::new("test1.rs"));
+    /* these should not find */
     ts.do_file(&Path::new("no_exist"));
     ts.set_txt("foo_bar");
     ts.do_file(&Path::new("lib.rs"));
-    ts.do_dir(&Path::new(".\\examples"));
-    ts.set_txt("text_search");
-    ts.do_file(&Path::new("test1.rs"));
+    println!();
+}
 
-    print!("\n\n  {}","That's all Folks!\n\n");
+fn match_regex(t:&str) {
+    print!("\n  -- testing regex match --");
+    print!("\n  searching with regex: {:?}", t);
+    let mut ts = Finder::<GenOut>::new();
+    ts.set_regex(t);
+    ts.do_dir(&Path::new(".\\src"));
+    ts.do_file(&Path::new("lib.rs"));
+    ts.do_dir(&Path::new(".\\examples"));
+    ts.do_file(&Path::new("test1.rs"));
+    /* these should not match */
+    ts.do_file(&Path::new("no_exist"));
+    ts.set_regex("foo_bar");
+    ts.do_file(&Path::new("lib.rs"));
+    println!();
+}
+
+fn main() {
+    print!("\n  {}","-- demo text_search package --\n");
+
+    find_text("DirEvent");
+    match_regex("DirEvent|main");
+
+    print!("\n  {}","That's all Folks!\n\n");
 }
